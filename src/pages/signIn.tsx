@@ -41,11 +41,11 @@ const SignIn = () => {
 
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", padding: "20px", backgroundImage: `url(${"images/background.jpg"})`, backgroundSize: "cover", backgroundPosition: "bottom" }}>
-      {/* <AppBar position="static" sx={{ backgroundColor: "white", borderRadius: "50px", opacity: 0.5 }}>
+      <AppBar position="static" sx={{ backgroundColor: "white", borderRadius: "50px", opacity: 0.5 }}>
         <Typography variant="h2" sx={{ textDecoration: "underline", fontFamily: "'Berkshire Swash', cursive", textAlign: "center", padding: "20px", color: "black" }}>
           RMIT
         </Typography>
-      </AppBar> */}
+      </AppBar>
       <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Paper elevation={3} sx={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "50px", width: "100%" }}>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", fontFamily: "'Eczar', serif;", textAlign: "center" }}>
