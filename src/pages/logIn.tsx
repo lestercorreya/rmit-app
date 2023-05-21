@@ -1,16 +1,18 @@
-import { Box, Typography, Button, TextField, Paper, AppBar, InputLabel, FormControl, FormHelperText, OutlinedInput, IconButton, InputAdornment } from '@mui/material';
+import { Box, Typography, Button, TextField, Paper, Snackbar, Alert, InputLabel, FormControl, FormHelperText, OutlinedInput, IconButton, InputAdornment } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from "yup"
 import { Link } from "react-router-dom"
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 const LogIn = () => {
-  interface Values {
+  type Values = {
     emailId: String,
     password: String
   }
+  type Alert = "success" | "error"
 
   const initialValues = {
     "emailId": "",
@@ -21,26 +23,32 @@ const LogIn = () => {
     password: Yup.string().required("Please enter a password").min(4, "must be atleast 4 characters long")
   })
 
+  const navigate = useNavigate()
+
   const [showPassword, setShowPassword] = useState(false)
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+  const [alertType, setAlertType] = useState<Alert>("error")
 
   const onSubmit = (values: Values) => {
-    axios.post('https://7x5bv0kfa8.execute-api.ap-southeast-2.amazonaws.com/dev/logIn', values)
+    axios.post('https://3ow7byfdjd.execute-api.ap-southeast-2.amazonaws.com/dev/logIn', values)
       .then((response: any) => {
-        console.log(response.data)
         sessionStorage.setItem("access_token", response.data.access_token);
+        setAlertMessage("User Logged In Successfully")
+        setAlertOpen(true)
+        setAlertType("success")
+        setTimeout(() => {
+          navigate("/")
+        }, 1000)
       })
-      .catch((error: Error) => {
-        console.log(error.message);
+      .catch((error: any) => {
+        setAlertMessage(error.response.data.message)
+        setAlertOpen(true)
       });
   }
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", padding: "20px", backgroundImage: `url(${"images/background.jpg"})`, backgroundSize: "cover" }}>
-      <AppBar position="static" sx={{ backgroundColor: "white", borderRadius: "50px", opacity: 0.5 }}>
-        <Typography variant="h2" sx={{ textDecoration: "underline", fontFamily: "'Berkshire Swash', cursive", textAlign: "center", padding: "20px", color: "black" }}>
-          Our App
-        </Typography>
-      </AppBar>
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", padding: "20px", backgroundImage: `url(${"images/background.jpg"})`, backgroundSize: "cover", backgroundPosition: "bottom" }}>
       <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Paper elevation={3} sx={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "50px", width: "100%" }}>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", fontFamily: "'Eczar', serif;", textAlign: "center" }}>
@@ -81,12 +89,22 @@ const LogIn = () => {
               </Form>
             )}
           </Formik>
-          <Typography variant="subtitle1" sx={{ fontFamily: "'Eczar', serif;", textAlign: "center" }}>
+          <Typography variant="subtitle1" sx={{ fontFamily: "'Eczar', serif;", textAlign: "center", marginBottom: "20px" }}>
             Don't have an account? {" "}
             <Link to="/signIn">Sign Up</Link>
           </Typography>
+          <Link to="/validate">
+            <Typography variant="h6" sx={{ fontFamily: "'Eczar', serif;", textAlign: "center" }}>
+              Validate Certificate
+            </Typography>
+          </Link>
         </Paper >
       </Box>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={() => setAlertOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setAlertOpen(false)} severity={alertType} sx={{ width: '100%' }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Box >
   );
 }

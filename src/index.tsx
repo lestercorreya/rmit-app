@@ -9,6 +9,7 @@ import "./index.css"
 
 import SignIn from './pages/signIn';
 import LogIn from './pages/logIn'
+import Validate from './pages/validate'
 import Home from './pages/home';
 
 const router = createBrowserRouter([
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/logIn",
     element: <LogIn />,
+  },
+  {
+    path: "/validate",
+    element: <Validate />,
   },
   {
     path: "/",
