@@ -116,10 +116,8 @@ const AdminPage = ({ adminDetails }: { adminDetails: AdminDetails }) => {
 
 const CustomCard = ({ url, role }: { url: string, role: string }) => {
 
-  const downloadImage = (url: any) => {
-    fetch(url, {
-      mode: 'no-cors',
-    })
+  const downloadImage = (src: string) => {
+    fetch(src, { headers: { "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Credentials": "true" } })
       .then(response => response.blob())
       .then(blob => {
         let blobUrl = window.URL.createObjectURL(blob);
