@@ -1,4 +1,4 @@
-import { Box, Typography, Button, TextField, Paper } from '@mui/material';
+import { Box, Typography, Button, TextField, Paper, Snackbar, Alert } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from "yup"
 import { Link } from "react-router-dom"
@@ -9,6 +9,7 @@ const Validate = () => {
   interface Values {
     certificateId: String,
   }
+  type Alert = "success" | "error"
 
   const initialValues = {
     "certificateId": "",
@@ -17,15 +18,22 @@ const Validate = () => {
     certificateId: Yup.string().required("Please enter a certificate Id").min(8, 'Must be exactly 8 characters').max(8, 'Must be exactly 8 characters'),
   })
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+  const [alertType, setAlertType] = useState<Alert>("error")
 
   const onSubmit = (values: Values) => {
     axios.post('https://3ow7byfdjd.execute-api.ap-southeast-2.amazonaws.com/dev/validate', values)
       .then((response: any) => {
+        setAlertMessage("Certificate Validated Successfully!")
+        setAlertOpen(true)
+        setAlertType("success")
         window.open(response.data.url, '_blank')?.focus();
       })
-      .catch((error: Error) => {
-        console.log(error.message);
+      .catch((error: any) => {
+        setAlertMessage(error.response.data.message)
+        setAlertOpen(true)
+        setAlertType("error")
       });
   }
 
@@ -58,6 +66,11 @@ const Validate = () => {
           </Typography>
         </Paper >
       </Box>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={() => setAlertOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setAlertOpen(false)} severity={alertType} sx={{ width: '100%' }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Box >
   );
 }

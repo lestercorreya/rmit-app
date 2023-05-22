@@ -49,6 +49,7 @@ const SignIn = () => {
       .catch((error: any) => {
         setAlertMessage(error.response.data.message)
         setAlertOpen(true)
+        setAlertType("error")
       });
   }
 

@@ -1,31 +1,31 @@
 import { useEffect, useState } from "react";
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, AppBar, Card, CardActionArea, CardMedia, Toolbar, CardActions, Button } from "@mui/material";
 
 type StudentDetails = {
-  name: String,
-  role: String,
-  certificates: Array<String>
+  name: string,
+  role: string,
+  certificates: Array<string>
 }
 type AdminDetails = {
-  name: String,
-  role: String,
+  name: string,
+  role: string,
   students: Array<{
-    name: String,
-    certificates: Array<String>
+    name: string,
+    certificates: Array<string>
   }>
 }
 
 const Home = () => {
   const navigate = useNavigate()
 
-  const [studentDetails, setStudentDetails] = useState({
+  const [studentDetails, setStudentDetails] = useState<StudentDetails>({
     name: "",
-    role: "Student",
+    role: "student",
     certificates: []
   })
-  const [adminDetails, setAdminDetails] = useState({
+  const [adminDetails, setAdminDetails] = useState<AdminDetails>({
     name: "",
     role: "admin",
     students: []
@@ -33,49 +33,122 @@ const Home = () => {
   const [role, setRole] = useState("Student")
 
   useEffect(() => {
-    axios.get('https://7x5bv0kfa8.execute-api.ap-southeast-2.amazonaws.com/dev/getDetails', {
+    axios.get('https://3ow7byfdjd.execute-api.ap-southeast-2.amazonaws.com/dev/getDetails', {
       headers: {
         'Authorization': `token ${sessionStorage.getItem("access_token")}`
       }
     })
       .then((response: any) => {
         setRole(response.data.role)
-        if (response.data.role == "Student") {
+        if (response.data.role == "student") {
           setStudentDetails(response.data)
         } else {
           setAdminDetails(response.data)
         }
       })
-      .catch(() => {
+      .catch((error) => {
         navigate("/login")
       });
   }, [])
 
+  const handleLogOut = () => {
+    sessionStorage.removeItem("access_token")
+    navigate("/login")
+  }
+
   return (
-    <Box sx={{ height: "100vh" }}>
-      {role == "Student" ? <StudentPage studentDetails={studentDetails} /> : <AdminPage adminDetails={adminDetails} />}
+    <Box sx={{ height: "100vh", backgroundImage: `url(${"images/home-background.jpg"})`, overflowY: "scroll", backgroundSize: "cover" }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            RMIT
+          </Typography>
+          <Button color="inherit" onClick={handleLogOut}>Log Out</Button>
+        </Toolbar>
+      </AppBar>
+      {role == "student" ? <StudentPage studentDetails={studentDetails} /> : <AdminPage adminDetails={adminDetails} />}
     </Box>
   );
 }
 
 const StudentPage = ({ studentDetails }: { studentDetails: StudentDetails }) => {
   return (
-    <>
-      <Typography variant="h2" sx={{ fontFamily: "'Eczar', serif;", textAlign: "center" }}>
-        Hello, {studentDetails.name}
+    <Box sx={{ padding: "50px" }}>
+      <Typography variant="h3" sx={{ fontFamily: "'Eczar', serif;" }}>
+        Welcome, {studentDetails.name}
       </Typography>
-    </>
+      <Typography variant="h4" sx={{ fontFamily: "'Eczar', serif;", margin: "50px 0" }}>
+        Certificates
+      </Typography>
+      <Box sx={{ display: "flex", gap: "40px" }}>
+        {studentDetails.certificates.map(url => {
+          return <CustomCard url={url} role={studentDetails.role} />
+        })}
+      </Box>
+    </Box>
   )
 }
 
 const AdminPage = ({ adminDetails }: { adminDetails: AdminDetails }) => {
   return (
-    <>
-      <Typography variant="h2" sx={{ fontFamily: "'Eczar', serif;", textAlign: "center" }}>
-        Hello, {adminDetails.name}
+    <Box sx={{ padding: "50px" }}>
+      <Typography variant="h3" sx={{ fontFamily: "'Eczar', serif;" }}>
+        Welcome, {adminDetails.name}
       </Typography>
-    </>
+      {adminDetails.students.map(student => {
+        return (
+          <>
+            <Typography variant="h4" sx={{ fontFamily: "'Eczar', serif;", margin: "20px 0" }}>
+              {student.name}'s Certificates
+            </Typography>
+            <Box sx={{ display: "flex", gap: "40px" }}>
+              {student.certificates.map(url => {
+                return <CustomCard url={url} role={adminDetails.role} />
+              })}
+            </Box>
+          </>
+        )
+      })}
+    </Box>
+  )
+}
 
+const CustomCard = ({ url, role }: { url: string, role: string }) => {
+
+  const downloadImage = (url: any) => {
+    fetch(url, {
+      mode: 'no-cors',
+    })
+      .then(response => response.blob())
+      .then(blob => {
+        let blobUrl = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.download = url.replace(/^.*[\\\/]/, '');
+        a.href = blobUrl;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+  }
+
+  return (
+    <Card sx={{ maxWidth: 345 }}>
+      <CardActionArea>
+        <CardMedia
+          component="img"
+          src={url}
+          alt="green iguana"
+          onClick={() => window.open(url, '_blank')?.focus()}
+        />
+      </CardActionArea>
+      {role == "student" &&
+        <CardActions>
+          <Button size="large" color="primary" onClick={() => downloadImage(url)}>
+            Download
+          </Button>
+        </CardActions>
+      }
+    </Card>
   )
 }
 
