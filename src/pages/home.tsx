@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import SchoolIcon from '@mui/icons-material/School';
 import { Box, Typography, AppBar, Card, CardActionArea, CardMedia, Toolbar, CardActions, Button } from "@mui/material";
 
 type StudentDetails = {
@@ -61,7 +62,7 @@ const Home = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            RMIT
+            <SchoolIcon />
           </Typography>
           <Button color="inherit" onClick={handleLogOut}>Log Out</Button>
         </Toolbar>
