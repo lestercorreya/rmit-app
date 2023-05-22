@@ -117,12 +117,12 @@ const AdminPage = ({ adminDetails }: { adminDetails: AdminDetails }) => {
 const CustomCard = ({ url, role }: { url: string, role: string }) => {
 
   const downloadImage = (src: string) => {
-    fetch(src, { headers: { "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Credentials": "true" } })
+    fetch(src, { headers: { "Access-Control-Allow-Headers": "*", "Access-Control-Allow-Credentials": "true" }, cache: "no-cache" })
       .then(response => response.blob())
       .then(blob => {
         let blobUrl = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
-        a.download = url.replace(/^.*[\\\/]/, '');
+        a.download = "certificate"
         a.href = blobUrl;
         document.body.appendChild(a);
         a.click();
